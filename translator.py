@@ -1,13 +1,13 @@
 # translator.py
 import tkinter as tk
 from antlr4 import *
-from antlr4.error.ErrorListener import ErrorListener  # Importar ErrorListener
+from antlr4.error.ErrorListener import ErrorListener
 from MySQLParser import MySQLParser
 from models import Tabla, Atributo
 
 
 class MySQLTranslator(ParseTreeListener):
-    def __init__(self, salida, error):
+    def __init__(self, salida, error, db_name_callback):
         self.tablas = []
         self.tablaActual = None
         self.ok = False
@@ -15,9 +15,15 @@ class MySQLTranslator(ParseTreeListener):
         self.nBD = ""
         self.salida = salida
         self.error = error
+        self.db_name_callback = (
+            db_name_callback  # Callback para establecer el nombre de la base de datos
+        )
 
     def enterCreacion(self, ctx: MySQLParser.CreacionContext):
         self.nBD = ctx.ID().getText()
+        self.db_name_callback(
+            self.nBD
+        )  # Establecer el nombre de la base de datos usando el callback
         self.ok = True
         self.salida.insert(tk.END, f"CREATE DATABASE IF NOT EXISTS {self.nBD};\n")
 
@@ -94,7 +100,6 @@ class MySQLTranslator(ParseTreeListener):
             self.error.insert(tk.END, "Error en generacion de Llave Foranea\n")
             self.errores += 1
 
-    # comentarios
     def enterCerrar(self, ctx: MySQLParser.CerrarContext):
         if self.ok and self.errores == 0:
             self.salida.insert(
