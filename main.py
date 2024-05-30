@@ -146,7 +146,7 @@ def generate_application_code():
 
                 for column in columns:
                     if (
-                        "auto_increment" in column[5] or "MUL" in column[3]
+                        "auto_increment" in column[5]
                     ):  # Excluir campos auto incrementables y llaves foráneas
                         continue
                     insert_query += f"{column[0]}, "
@@ -181,7 +181,7 @@ def generate_application_code():
 
                 for column in columns:
                     if (
-                        "auto_increment" in column[5] or "MUL" in column[3]
+                        "auto_increment" in column[5]
                     ):  # Excluir campos auto incrementables y llaves foráneas
                         continue
                     code_file.write(
