@@ -24,7 +24,7 @@ class MySQLErrorListener(ErrorListener):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.error_area.insert(
-            tk.END, f"Error de sintaxis en línea {line}, columna {column}: {msg}\n"
+            tk.END, f"Error de sintaxis en linea {line}, columna {column}: {msg}\n"
         )
         self.has_errors = True
 
@@ -187,22 +187,23 @@ def generate_application_code():
                     code_file.write(
                         f"{column[0]}_label = tk.Label(root, text='{column[0]} ({column[1]})')\n"
                     )
-                    code_file.write(f"{column[0]}_label.pack()\n")
+                    code_file.write(f"{column[0]}_label.pack(pady=5)\n")
                     code_file.write(f"{column[0]}_entry = tk.Entry(root)\n")
-                    code_file.write(f"{column[0]}_entry.pack()\n\n")
+                    code_file.write(f"{column[0]}_entry.pack(pady=5)\n\n")
 
                 code_file.write(
-                    "insert_button = tk.Button(root, text='Insertar', command=insert_data)\n"
+                    "insert_button = tk.Button(root, text='Insertar', command=insert_data, bg='#4caf50', fg='white', font=('Helvetica', 12), padx=10, pady=5)\n"
                 )
-                code_file.write("insert_button.pack()\n\n")
+                code_file.write("insert_button.pack(pady=10)\n\n")
+                code_file.write("root.configure(bg='#2b2b2b')\n")
                 code_file.write("root.mainloop()\n")
 
         cursor.close()
         connection.close()
-        messagebox.showinfo("Exito", "Código de la aplicación generado exitosamente.")
+        messagebox.showinfo("Exito", "Codigo de la aplicacion generado exitosamente.")
     except mysql.connector.Error as err:
         messagebox.showerror(
-            "Error", f"Error al generar el código de la aplicación: {err}"
+            "Error", f"Error al generar el codigo de la aplicacion: {err}"
         )
 
 
@@ -236,13 +237,15 @@ root.title("MySQL Translator")
 
 # Estilo general
 root.configure(bg="#2b2b2b")
-font_style = ("Helvetica", 12)
+font_style = ("Terminal", 11)
 button_style = {
     "font": font_style,
-    "bg": "#4caf50",
+    "bg": "#40e050",
     "fg": "white",
     "padx": 10,
     "pady": 5,
+    "relief": "flat",
+    "bd": 0,
 }
 label_style = {"font": font_style, "bg": "#2b2b2b", "fg": "white"}
 
@@ -257,6 +260,8 @@ input_area = scrolledtext.ScrolledText(
     bg="#1e1e1e",
     fg="white",
     insertbackground="white",
+    borderwidth=1,
+    relief="sunken",
 )
 input_area.pack(pady=(0, 10))
 
@@ -271,6 +276,8 @@ output_area = scrolledtext.ScrolledText(
     bg="#1e1e1e",
     fg="white",
     insertbackground="white",
+    borderwidth=1,
+    relief="sunken",
 )
 output_area.pack(pady=(0, 10))
 
@@ -285,6 +292,8 @@ error_area = scrolledtext.ScrolledText(
     bg="#1e1e1e",
     fg="white",
     insertbackground="white",
+    borderwidth=1,
+    relief="sunken",
 )
 error_area.pack(pady=(0, 10))
 
@@ -307,7 +316,7 @@ create_db_button.pack(pady=(10, 0))
 # Botón para generar el código de la aplicación
 generate_code_button = tk.Button(
     root,
-    text="Generar Código de Aplicación",
+    text="Generar Codigo de Aplicacion",
     command=generate_application_code,
     state=tk.DISABLED,
     **button_style,
