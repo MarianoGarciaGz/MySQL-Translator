@@ -1,6 +1,7 @@
 # main.py
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, messagebox  # Importar messagebox correctamente
+import mysql.connector
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener  # Importar ErrorListener
 from MySQLLexer import MySQLLexer
@@ -12,11 +13,13 @@ class MySQLErrorListener(ErrorListener):
     def __init__(self, error_area):
         super(MySQLErrorListener, self).__init__()
         self.error_area = error_area
+        self.has_errors = False
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.error_area.insert(
             tk.END, f"Error de sintaxis en línea {line}, columna {column}: {msg}\n"
         )
+        self.has_errors = True
 
 
 def run_translator():
@@ -42,6 +45,37 @@ def run_translator():
     translator = MySQLTranslator(output_area, error_area)
     walker = ParseTreeWalker()
     walker.walk(translator, tree)
+
+    # Habilitar o deshabilitar el botón según los errores
+    if error_listener.has_errors or translator.errores > 0:
+        create_db_button.config(state=tk.DISABLED)
+    else:
+        create_db_button.config(state=tk.NORMAL)
+
+
+def create_database():
+    try:
+        # Conectar a MySQL
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",  # Reemplaza con tu usuario de MySQL
+            password="",  # Reemplaza con tu contraseña de MySQL
+        )
+        cursor = connection.cursor()
+
+        # Ejecutar los comandos SQL compilados
+        sql_commands = output_area.get("1.0", tk.END).strip()
+        commands = sql_commands.split(";")
+        for command in commands:
+            if command.strip():
+                cursor.execute(command.strip())
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+        messagebox.showinfo("Éxito", "Base de datos creada exitosamente.")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error al crear la base de datos: {err}")
 
 
 # Configuración de la ventana principal
@@ -69,6 +103,12 @@ error_area.pack()
 # Botón para ejecutar la traducción
 translate_button = tk.Button(root, text="Traducir", command=run_translator)
 translate_button.pack()
+
+# Botón para crear la base de datos
+create_db_button = tk.Button(
+    root, text="Crear base de datos", command=create_database, state=tk.DISABLED
+)
+create_db_button.pack()
 
 # Iniciar la aplicación
 root.mainloop()

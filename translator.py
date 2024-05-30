@@ -1,9 +1,7 @@
 # translator.py
 import tkinter as tk
 from antlr4 import *
-from antlr4.error.ErrorListener import (
-    ErrorListener,
-)  # Asegúrate de importar ErrorListener
+from antlr4.error.ErrorListener import ErrorListener  # Importar ErrorListener
 from MySQLParser import MySQLParser
 from models import Tabla, Atributo
 
@@ -38,6 +36,13 @@ class MySQLTranslator(ParseTreeListener):
         a = Atributo(f"{tabla_nombre}_key", "PRIMARY KEY")
         self.tablaActual.atributos.append(a)
         self.ok = True
+
+    def exitTabla(self, ctx: MySQLParser.TablaContext):
+        if self.ok:
+            self.salida.insert(tk.END, "\n);\n")
+        else:
+            self.error.insert(tk.END, "Error en la creación de la tabla.\n")
+            self.errores += 1
 
     def enterCampo(self, ctx: MySQLParser.CampoContext):
         self.ok = False
@@ -89,24 +94,16 @@ class MySQLTranslator(ParseTreeListener):
             self.error.insert(tk.END, "Error en generacion de Llave Foranea\n")
             self.errores += 1
 
+    # comentarios
     def enterCerrar(self, ctx: MySQLParser.CerrarContext):
         if self.ok and self.errores == 0:
+            self.salida.insert(
+                tk.END, "\n"
+            )  # Terminar la última declaración CREATE TABLE
             for tabla in self.tablas:
                 self.salida.insert(tk.END, f"\n\n -- Tabla: {tabla.nombre}")
                 for a in tabla.atributos:
-                    self.salida.insert(tk.END, f"\n--Atributo:  {a.nombreAtributo}")
-                    self.salida.insert(tk.END, f"\n \t--TipoAtrib: {a.tipoAtributo}")
+                    self.salida.insert(tk.END, f"\n-- Atributo:  {a.nombreAtributo}")
+                    self.salida.insert(tk.END, f"\n \t-- TipoAtrib: {a.tipoAtributo}")
         else:
             self.error.insert(tk.END, f"Numero de Errores: {self.errores}")
-
-
-# Clase para el manejador de errores
-class MySQLErrorListener(ErrorListener):
-    def __init__(self, error_area):
-        super(MySQLErrorListener, self).__init__()
-        self.error_area = error_area
-
-    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        self.error_area.insert(
-            tk.END, f"Error de sintaxis en línea {line}, columna {column}: {msg}\n"
-        )
