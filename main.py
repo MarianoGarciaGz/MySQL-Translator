@@ -122,7 +122,7 @@ def generate_application_code():
             cursor.execute(f"DESCRIBE {table_name}")
             columns = cursor.fetchall()
 
-            with open(f"app/{table_name}_form.py", "w") as code_file:
+            with open(f"{table_name}_form.py", "w") as code_file:
                 code_file.write("import tkinter as tk\n")
                 code_file.write("from tkinter import messagebox\n")
                 code_file.write("import mysql.connector\n\n")
