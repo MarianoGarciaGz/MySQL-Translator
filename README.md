@@ -1,4 +1,4 @@
-# MySQL Translator
+# MySQL Translator with ANTLR
 
 MySQL Translator es una aplicación que permite transformar instrucciones MySQL escritas en español a lenguaje SQL estándar. Además, genera código para formularios en Python que permiten la inserción de datos en las tablas creadas en la base de datos.
 
