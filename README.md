@@ -1,7 +1,3 @@
-¡Claro! Aquí tienes un ejemplo de README para tu proyecto. Asegúrate de ajustar los detalles específicos según tus necesidades.
-
----
-
 # MySQL Translator
 
 MySQL Translator es una aplicación que permite transformar instrucciones MySQL escritas en español a lenguaje SQL estándar. Además, genera código para formularios en Python que permiten la inserción de datos en las tablas creadas en la base de datos.
